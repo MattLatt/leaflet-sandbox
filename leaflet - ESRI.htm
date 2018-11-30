@@ -3,19 +3,50 @@
   <meta charset=utf-8 />
   <title>Esri Leaflet Quickstart</title>
   <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
-
+    <!-- Load FontAwesome -->
+    <link rel="stylesheet" href="3rdpart/fontawesome-5.5.0-free/all.css" crossorigin="anonymous">
     <!-- Load Leaflet from CDN -->
     <link rel="stylesheet" href="./leaflet.css" crossorigin=""/>
     <script src="./leaflet-src.js" crossorigin=""></script>
-
-
+    <!-- Load Leaflet.contextmenu plugin -->  
+    <link rel="stylesheet" href="./plugins/leaflet.contextmenu.css" crossorigin=""/>
+    <script src="./plugins/leaflet.contextmenu.js" crossorigin=""></script>    
+    <!-- Load Leaflet.draw plugin -->  
+    <link rel="stylesheet" href="./plugins/leaflet.draw.css" crossorigin=""/>
+    <script src="./plugins/leaflet.draw.js" crossorigin=""></script>    
+    <!-- Load Leaflet.toolbar plugin -->  
+    <link rel="stylesheet" href="./plugins/leaflet.toolbar.css" crossorigin=""/>
+    <script src="./plugins/leaflet.toolbar.js" crossorigin=""></script>    
     <!-- Load Esri Leaflet from CDN -->
     <script src="./esri-dist/esri-leaflet-debug.js" crossorigin=""></script>
-
+    <!-- Load Esri Leaflet from CDN -->
+    <link rel="stylesheet" href="./plugins/easy-button.css">
+    <script src="./plugins/easy-button.js"></script>
 
   <style>
     body { margin:0; padding:0; }
     #map { position: absolute; top:0; bottom:0; right:0; left:0; }
+    
+    .state-remove-markers,
+    .state-add-markers{
+      transition-duration: .5s;
+      transform: scaleY(0);
+      position: absolute;
+      display: block;
+      top: 5;
+      width: 100%;}
+    
+    .state-remove-markers{
+      transform-origin: 50% 0; }
+    .state-add-markers{
+      transform-origin: 50% 100%; }
+    
+    .state-remove-markers.remove-markers-active{
+      transform: scaleY(1); }
+    
+    .state-add-markers.add-markers-active{
+      transform: scaleY(1); }   
+      
   </style>
 </head>
 <body>
@@ -23,10 +54,147 @@
 <div id="map"></div>
 
 <script>
-  //var map = L.map("map").setView([43.58, 7.0], 12);
-  var map = L.map("map").setView([48.84, 2.34], 12);
 
+  var initialLoc = new L.LatLng(48.84, 2.34);
+  var marker = new L.LatLng(48.74, 2.44);
+
+  function showCoordinates (e) {
+    alert(e.latlng);
+  }
+
+  function centerMap (e) {
+    map.panTo(e.latlng);
+  }
+
+  function zoomIn (e) {
+    map.zoomIn();
+  }
+
+  function zoomOut (e) {
+    map.zoomOut();
+  }
+
+  
+  
+  map = L.map('map', {
+	      center: initialLoc,
+	      zoom: 12,
+	      contextmenu: true,
+	      contextmenuWidth: 140,
+	      contextmenuItems: [{
+		      text: 'Show coordinates',
+		      callback: showCoordinates
+	      }, {
+		      text: 'Center map here',
+		      callback: centerMap
+	      }, '-', {
+		      text: 'Zoom in',
+		      icon: 'plugins/images/zoom-in.png',
+		      callback: zoomIn
+	      }, {
+		      text: 'Zoom out',
+		      icon: 'plugins/images/zoom-out.png',
+		      callback: zoomOut
+	  }]
+      });
+ 
+ 
+var randomMarkers = L.layerGroup([L.marker([48.845, 2.35]), L.marker([48.785, 2.541]), L.marker([48.821, 2.451]) ]);
+
+var animatedToggle = L.easyButton({
+  id: 'animated-marker-toggle',
+  type: 'animate',
+  states: [{
+    stateName: 'add-markers',
+    icon: 'fa-map-marker-alt',
+    title: 'add some markers',
+    onClick: function(control) {
+      map.addLayer(randomMarkers);
+      control.state('remove-markers');
+    }
+  }, {
+    stateName: 'remove-markers',
+    title: 'remove markers',
+    icon: 'fa-undo',
+    onClick: function(control) {
+      map.removeLayer(randomMarkers);
+      control.state('add-markers');
+    }
+  }]
+});
+animatedToggle.addTo(map);
+    
+
+ 
   L.esri.basemapLayer("Topographic").addTo(map);
+  
+  var drawnItems = new L.FeatureGroup();
+  map.addLayer(drawnItems);
+
+  var drawControl = new L.Control.Draw({
+      position: 'topright',
+      edit: {
+	featureGroup: drawnItems,
+	poly: {
+	    allowIntersection: false
+	}
+    },
+    draw: {
+	polygon: {
+	    allowIntersection: false,
+	    showArea: true
+	}
+    }
+  });
+  map.addControl(drawControl); 
+
+  
+  map.on(L.Draw.Event.CREATED, function (e) {
+      var type = e.layerType,
+	  layer = e.layer;
+
+      if (type === 'marker') {
+	  layer.bindPopup('A popup!');
+      }
+
+      drawnItems.addLayer(layer);
+  });
+
+  map.on(L.Draw.Event.EDITED, function (e) {
+      var layers = e.layers;
+      var countOfEditedLayers = 0;
+      layers.eachLayer(function(layer) {
+	  countOfEditedLayers++;
+      });
+      console.log("Edited " + countOfEditedLayers + " layers");
+  });  
+  
+  
+
+  
+  
+/*
+  L.marker(initialLoc, {
+      contextmenu: true,
+      contextmenuItems: [{
+	  text: 'Marker item',
+	  index: 0
+      }, {
+	  separator: true,
+	  index: 1
+      }]
+  }).addTo(map);
+
+  L.marker(marker, {
+      contextmenu: true,
+      contextmenuInheritItems: false,
+      contextmenuItems: [{
+	  text: 'Marker item'
+      }]
+  }).addTo(map);  
+  */
+  
+  
 </script>
 
 </body>

@@ -1,0 +1,19 @@
+.state-remove-markers,
+.state-add-markers{
+  transition-duration: .5s;
+  transform: scaleY(0);
+  position: absolute;
+  display: block;
+  top: 5;
+  width: 100%;}
+
+.state-remove-markers{
+  transform-origin: 50% 0; }
+.state-add-markers{
+  transform-origin: 50% 30%; }
+
+.state-remove-markers.remove-markers-active{
+  transform: scaleY(1); }
+
+.state-add-markers.add-markers-active{
+  transform: scaleY(1); }

@@ -51,6 +51,42 @@
 	}
   ).addTo(map) ;
 
+  /*
+  
+  var bbox = [643250.0, 6857750.0, 654500.0, 6863750.0];
+  
+  var maxResolution=2048.0;
+  
+  var scale = function (zoom) {
+    return 1/(maxResolution /Math/pow(2,zoom)):
+  };
+  
+  var transformation = new L.Transform(1,-bbox[0], -1,bbox[3]);
+  
+    
+  // Official Spatial Reference from http://www.spatialreference.org/ref/epsg/2154/
+  var L93 = L.CRS.proj4js('EPSG:2154',
+			  '+proj=lcc +lat_1=49 +lat_2=44 +lat_0=46.5 +lon_0=3 +x_0=700000 +y_0=6600000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs',
+			  transformation);
+  crs.scale = scale; // required by Leaflet 0.4
+  
+  // Location of tiles (see next paragraph)
+  var ignLayer = new L.TileLayer('http://localhost:8080/1.0.0/ign/{z}/{x}/{y}.png', {
+      continuousWorld: true,  // very important
+  });
+    
+  map = new L.Map('map', {
+    crs: L93,
+    scale: scale,
+    continuousWorld: true,  // very important
+    layers: [ignLayer,]
+    // Initial view
+    center: new L.LatLng(48.84, 2.34), // Universal Lat/Lng
+    zoom: 5,
+});
+*/
+  
+  
 </script>
 
 </body>
